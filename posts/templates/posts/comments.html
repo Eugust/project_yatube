@@ -1,0 +1,38 @@
+{% load user_filters %}
+
+{% if user.is_authenticated %}
+<div class="card my-4">
+    <form method="post" action="{% url 'posts:add_comment' author.username post.id %}">
+        {% csrf_token %}
+        <h5 class="card-header">Добавить комментарий:</h5>
+        <div class="card-body">
+            <div class="form-group">
+                {{ form.text|addclass:"form-control" }}
+            </div>
+            <button type="submit" class="btn btn-primary">Отправить</button>
+        </div>
+    </form>
+</div>
+{% endif %}
+
+<!-- Комментарии -->
+{% if post.comments.exists %}
+<div>
+    Комментариев: {{ post.comments.count }}
+</div>
+<div class="card">
+    <ul class="list-group list-group-flush">
+    {% for comment in post.comments.all %}
+        <li class="list-group-item">
+            <a href="{% url 'posts:profile' comment.author %}" name="comment_{{ item.id }}">{{ comment.author }}</a>
+            {{ comment.text|linebreaks }}
+            <small class="text-muted">Дата: {{ comment.created }}</small>
+        </li>
+    {% endfor %}
+    </ul>
+</div>
+{% else %}
+<div>
+    Комментариев еще нет, будь первым!
+</div>
+{% endif %}

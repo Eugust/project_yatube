@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block title %} Комментарий к посту {% endblock %}
+{% block content %}
+<main role="main" class="container">
+    <div class="row">
+            <div class="col-md-3 mb-3 mt-1">
+                <div class="card">
+                        <div class="card-body">
+                                <div class="h2">
+                                    <!-- Имя автора -->
+                                    {{ author.first_name }}
+                                </div>
+                                <div class="h3 text-muted">
+                                     <!-- username автора -->
+                                     {{ author.username }}
+                                </div>
+                        </div>
+                        <ul class="list-group list-group-flush">
+                                <li class="list-group-item">
+                                        <div class="h6 text-muted">
+                                        Подписчиков: 0 <br />
+                                        Подписан: 0
+                                        </div>
+                                </li>
+                                <li class="list-group-item">
+                                        <div class="h6 text-muted">
+                                            <!--Количество записей -->
+                                            Записей: {{ post_count }}
+                                        </div>
+                                </li>
+                        </ul>
+                </div>
+        </div>
+        <div class="col-md-9">
+                {% include "post_item.html" with post=post %}
+                {% include "comments.html" with form=form %}
+        </div>
+    </div>
+</main> 
+{% endblock %}
