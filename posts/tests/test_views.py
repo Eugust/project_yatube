@@ -2,6 +2,7 @@ import shutil
 import tempfile
 import re
 
+from django.core.cache import cache
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.test import Client, TestCase
@@ -10,7 +11,7 @@ from django.urls import reverse
 from django import forms
 import time
 
-from posts.models import Group, Post
+from posts.models import Group, Post, Follow
 
 User = get_user_model()
 
@@ -26,6 +27,13 @@ class PostPagesTests(TestCase):
         cls.test_author = User.objects.create_user(
             username="Автор"
         )
+        cls.test_follower = User.objects.create_user(
+            username="test-follower"
+        )
+        cls.test_unfollower = User.objects.create_user(
+            username="test-unfollower"
+        )
+        Follow.objects.create(user=cls.test_follower, author=cls.test_author)
         cls.test_group_2 = Group.objects.create(
             title="Дополнительная группа", slug="test-slug-2"
         )
@@ -56,16 +64,26 @@ class PostPagesTests(TestCase):
 
     @classmethod
     def tearDownClass(cls) -> None:
-        shutil.rmtree(settings.MEDIA_ROOT, ignore_errors=True)
         super().tearDownClass()
+        shutil.rmtree(settings.MEDIA_ROOT, ignore_errors=True)
 
     def setUp(self) -> None:
+        # неавторизованный юзер
         self.guest_client = Client()
+        # авторизованные юзер
         self.user = User.objects.create_user(username="Andrey")
         self.authorized_client = Client()
         self.authorized_client.force_login(self.user)
+        # регистрация автора
         self.author_client = Client()
         self.author_client.force_login(self.test_author)
+        # регистрация подписчика
+        self.follower = Client()
+        self.follower.force_login(self.test_follower)
+        # регистрация не подписчика
+        self.unfollower = Client()
+        self.unfollower.force_login(self.test_unfollower)
+        # пост
         Post.objects.create(
             text="Пост",
             author=PostPagesTests.test_author,
@@ -98,6 +116,23 @@ class PostPagesTests(TestCase):
         self.assertTrue(
             re.fullmatch(r"posts/test_image.*\.gif", "posts/test_image.gif")
         )
+
+    def test_follow_index_page_show_correct_context(self):
+        response = self.follower.get(reverse("posts:follow_index"))
+        first_object = response.context.get("page").object_list[0]
+        post_text_0 = first_object.text
+        post_group_0 = first_object.group.title
+        post_author_0 = first_object.author.username
+        self.assertEqual(post_text_0, "Пост")
+        self.assertEqual(post_group_0, self.test_group.title)
+        self.assertEqual(post_author_0, self.test_author.username)
+
+    def test_unfollow_index_page_show_correct_context(self):
+        response = self.unfollower.get(reverse("posts:follow_index"))
+        try:
+            response.context.get("page").object_list[0]
+        except IndexError:
+            self.assertTrue(True)
 
     def test_group_page_show_correct_context(self):
         response = self.authorized_client.get(reverse(
@@ -180,3 +215,12 @@ class PostPagesTests(TestCase):
     def test_wrong_url_returns_404(self):
         response = self.guest_client.get("/404/")
         self.assertEqual(response.status_code, 404)
+
+    def test_cache_index_page(self):
+        response_1 = self.authorized_client.get(reverse("posts:index"))
+        Post.objects.create(text="cache", author=self.test_author)
+        response_2 = self.authorized_client.get(reverse("posts:index"))
+        cache.clear()
+        response_3 = self.authorized_client.get(reverse("posts:index"))
+        self.assertEqual(response_1.content, response_2.content)
+        self.assertNotEqual(response_2.content, response_3.content)
