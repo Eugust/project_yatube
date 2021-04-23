@@ -29,6 +29,19 @@ class PostPagesTests(TestCase):
         cls.test_group_2 = Group.objects.create(
             title="Дополнительная группа", slug="test-slug-2"
         )
+        cls.test_gif = (
+            b'\x47\x49\x46\x38\x39\x61\x02\x00'
+            b'\x01\x00\x80\x00\x00\x00\x00\x00'
+            b'\xFF\xFF\xFF\x21\xF9\x04\x00\x00'
+            b'\x00\x00\x00\x2C\x00\x00\x00\x00'
+            b'\x02\x00\x01\x00\x00\x02\x02\x0C'
+            b'\x0A\x00\x3B'
+        )
+        cls.uploaded = SimpleUploadedFile(
+            name='test_image.gif',
+            content=cls.test_gif,
+            content_type='image/gif'
+        )
         cls.posts = []
         for num in range(10):
             time.sleep(0.01)
@@ -53,16 +66,11 @@ class PostPagesTests(TestCase):
         self.authorized_client.force_login(self.user)
         self.author_client = Client()
         self.author_client.force_login(self.test_author)
-        self.image = SimpleUploadedFile(
-            name="test_image.gif",
-            content=b'\x47\x49\x46\x38\x39\x61\x01\x00',
-            content_type="image/gif",
-        )
         Post.objects.create(
             text="Пост",
             author=PostPagesTests.test_author,
             group=PostPagesTests.test_group,
-            image=self.image
+            image=self.uploaded
         )
 
     def test_pages_uses_correct_template(self):
@@ -118,7 +126,7 @@ class PostPagesTests(TestCase):
         }
         for value, expected in form_fields.items():
             with self.subTest(value=value):
-                form_field = response.context['form'].fields[value]
+                form_field = response.context["form"].fields[value]
                 self.assertIsInstance(form_field, expected)
 
     def test_profile_page_show_correct_context(self):
@@ -166,7 +174,7 @@ class PostPagesTests(TestCase):
         }
         for value, expected in form_fields.items():
             with self.subTest(value=value):
-                form_field = response.context['form'].fields[value]
+                form_field = response.context["form"].fields[value]
                 self.assertIsInstance(form_field, expected)
 
     def test_wrong_url_returns_404(self):

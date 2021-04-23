@@ -1,7 +1,6 @@
-from django.shortcuts import render, get_object_or_404, redirect, HttpResponse
+from django.shortcuts import render, get_object_or_404, redirect
 from django.core.paginator import Paginator
 from django.contrib.auth.decorators import login_required
-#from django.views.decorators.cache import cache_page
 from django.urls import reverse
 from django.contrib.auth import get_user_model
 
@@ -27,7 +26,7 @@ def new_post(request):
         new_form.author = request.user
         new_form.save()
         return redirect(reverse("posts:index"))
-    return render(request, "new_post.html", {'form': form, 'is_new': True})
+    return render(request, "new_post.html", {"form": form, "is_new": True})
 
 
 def group_post(request, slug):
@@ -39,7 +38,7 @@ def group_post(request, slug):
     return render(
         request,
         "group.html",
-        {'group': group, 'page': page}
+        {"group": group, "page": page}
     )
 
 
@@ -61,7 +60,7 @@ def profile(request, username):
         "post_count": post_count,
         "following": following
     }
-    return render(request, 'profile.html', context)
+    return render(request, "profile.html", context)
 
 
 def post_view(request, username, post_id):
@@ -79,7 +78,7 @@ def post_view(request, username, post_id):
     }
     return render(
         request,
-        'post.html',
+        "post.html",
         context
     )
 
@@ -97,10 +96,16 @@ def post_edit(request, username, post_id):
         if form.is_valid():
             form.save()
             return redirect("posts:post", username=username, post_id=post_id)
+        context = {
+            "form": form,
+            "author": author,
+            "post_id": post_id,
+            "post": edit_post
+        }
         return render(
             request,
             "new_post.html",
-            {'form': form, "author": author, "post_id": post_id}
+            context
         )
     else:
         return redirect("posts:post", username=username, post_id=post_id)
@@ -149,7 +154,11 @@ def follow_index(request):
     paginator = Paginator(following_posts, 10)
     page_number = request.GET.get("page")
     page = paginator.get_page(page_number)
-    return render(request, "follow.html", {"page": page})
+    context = {
+        "page": page,
+        "follow": True,
+    }
+    return render(request, "follow.html", context)
 
 
 @login_required

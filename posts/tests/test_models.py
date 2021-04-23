@@ -16,12 +16,12 @@ class GroupModelTest(TestCase):
 
     def test_title_label(self):
         group = GroupModelTest.group
-        verbose = group._meta.get_field('title').verbose_name
+        verbose = group._meta.get_field("title").verbose_name
         self.assertEqual(verbose, "Название группы")
 
     def test_title_help_text(self):
         group = GroupModelTest.group
-        help_text = group._meta.get_field('title').help_text
+        help_text = group._meta.get_field("title").help_text
         self.assertEqual(help_text, "Введите название группы")
 
     def test_object_name_is_title_field(self):
@@ -41,12 +41,12 @@ class PostModelTest(TestCase):
 
     def test_title_label(self):
         post = PostModelTest.post
-        verbose = post._meta.get_field('text').verbose_name
+        verbose = post._meta.get_field("text").verbose_name
         self.assertEqual(verbose, "Пост")
 
     def test_title_help_text(self):
         post = PostModelTest.post
-        help_text = post._meta.get_field('text').help_text
+        help_text = post._meta.get_field("text").help_text
         self.assertEqual(help_text, "Напишите свой пост")
 
     def test_len_title_field_object_name(self):

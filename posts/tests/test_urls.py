@@ -48,6 +48,15 @@ class PostURLTests(TestCase):
                 kwargs={"slug": "test-slug"}
             ),
             "new_post.html": reverse("posts:new_post"),
+            "follow.html": reverse("posts:follow_index"),
+            "profile.html": reverse(
+                "posts:profile",
+                kwargs={"username": "Test-user"}
+            ),
+            "post.html": reverse(
+                "posts:post",
+                kwargs={"username": "Test-user", "post_id": 1}
+            ),
         }
 
     def test_home_url(self):
@@ -95,15 +104,25 @@ class PostURLTests(TestCase):
         response = self.author_client.get(reverse(
             "posts:post_edit", kwargs={"username": "Test-user", "post_id": 1}))
         self.assertEqual(response.status_code, 200)
-    """
+
     def test_edit_post_for_anon_url(self):
         response = self.guest_client.get(reverse(
             "posts:post_edit", kwargs={"username": "Test-user", "post_id": 1}))
-        self.assertRedirects(response, reverse(
-            "posts:post", kwargs={"username": "Test-user", "post_id": 1}))
-    """
+        self.assertEqual(response.status_code, 302)
+
     def test_edit_post_for_authorized_url(self):
         response = self.authorized_client.get(reverse(
-            "posts:post_edit", kwargs={"username": "Test-user", "post_id": 1}))
+            "posts:post_edit", kwargs={"username": "Test-user", "post_id": 1})
+        )
         self.assertRedirects(response, reverse(
             "posts:post", kwargs={"username": "Test-user", "post_id": 1}))
+
+    def test_add_comment_for_anon_url(self):
+        response = self.guest_client.get(reverse(
+            "posts:add_comment",
+            kwargs={"username": "Test-user", "post_id": 1})
+        )
+        self.assertRedirects(
+            response,
+            "/auth/login/?next=/Test-user/1/comment"
+        )

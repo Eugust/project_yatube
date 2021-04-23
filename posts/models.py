@@ -80,7 +80,7 @@ class Comment(models.Model):
         ordering = ["created"]
 
     def __str__(self):
-        return 'Комментарий от {} для поста {}'.format(self.author, self.post)
+        return "Комментарий от {} для поста {}".format(self.author, self.post)
 
 
 class Follow(models.Model):
