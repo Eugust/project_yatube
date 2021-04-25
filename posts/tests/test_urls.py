@@ -122,7 +122,4 @@ class PostURLTests(TestCase):
             "posts:add_comment",
             kwargs={"username": "Test-user", "post_id": 1})
         )
-        self.assertRedirects(
-            response,
-            "/auth/login/?next=/Test-user/1/comment"
-        )
+        self.assertRedirects(response, reverse("login"))
