@@ -4,7 +4,7 @@ from django.contrib.auth.decorators import login_required
 from django.urls import reverse
 from django.contrib.auth import get_user_model
 
-from .models import Comment, Post, Group, Follow
+from .models import Post, Group, Follow
 from .forms import PostForm, CommentForm
 
 User = get_user_model()

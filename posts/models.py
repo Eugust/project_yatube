@@ -99,6 +99,9 @@ class Follow(models.Model):
         return "{} подписался на {} ".format(self.user, self.author)
 
     class Meta:
-        constraints =[
-            models.UniqueConstraint(fields=["user", "author"], name="unique_subs")
+        constraints = [
+            models.UniqueConstraint(
+                fields=["user", "author"],
+                name="unique_subs"
+            )
         ]
