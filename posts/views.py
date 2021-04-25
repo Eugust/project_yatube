@@ -48,7 +48,7 @@ def profile(request, username):
     subs = Follow.objects.filter(author=author).count()
     following = False
     if request.user.is_authenticated:
-        user = get_object_or_404(User, user=request.user)
+        user = get_object_or_404(User, user=request.user.username)
         if Follow.objects.filter(user=user, author=author).exists():
             following = True
     post_list = author.posts.all()
