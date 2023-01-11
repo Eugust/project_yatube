@@ -3,7 +3,7 @@ Project from Yandex.Practicum courses
 
 The project is a small social network where users can post their posts on different topics and attach images to them. Posts are divided into different topics (music, movies, etc.), the user himself creates a tag for his post. Also, the social network has the ability to subscribe to the author and track his latest updates and unsubscribe from the author. The author can track how many subscribers he has. Each author has his own page with summary information and all his posts.
 ## Tools
-Django, HTML, CSS, Bootstrap
+Django, HTML, CSS, Bootstrap, React
 ## Instruction
 Create a virtual environment in the project
 ```
